@@ -1,0 +1,12 @@
+.git
+.github
+scripts
+ .dockerignore
+ Dockerfile
+
+
+README.md
+
+/src/main/resources/application-secret.yml
+/src/main/resources/application.tar
+/src/test/
