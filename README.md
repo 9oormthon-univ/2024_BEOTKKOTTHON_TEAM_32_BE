@@ -20,26 +20,4 @@ EX) Chore :: 패키지 수정
 ```
 
 
-## git hook setting
-
-### Step1
-```
-cd .git/hooks
-```
-
-### Step2
-```
-Set-Content commit-msg -Value @'
-#!/bin/sh
-# Read the commit message from the file.
-COMMIT_MSG=$(cat $1)
-# Check if the commit message follows the specified pattern.
-if ! echo "$COMMIT_MSG" | grep -E "^(Feat|Fix|Docs|Style|Refactor|Test|Chore|Design|Comment|Rename|Remove|!BREAKING CHANGE|!HOTFIX) ::" > /dev/null; then
-    echo "The commit message does not follow the specified format."
-    echo "Allowed formats: Feat ::, Fix ::, Docs ::, Style ::, Refactor ::, Test ::, Chore ::, Design ::, Comment ::, Rename ::, Remove ::, !BREAKING CHANGE ::, !HOTFIX ::"
-    exit 1
-fi
-'@
-```
-
 

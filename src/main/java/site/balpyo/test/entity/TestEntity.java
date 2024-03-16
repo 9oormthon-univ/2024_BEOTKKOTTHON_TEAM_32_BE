@@ -1,10 +1,9 @@
 package site.balpyo.test.entity;
 
+import com.sun.istack.NotNull;
+import com.sun.istack.Nullable;
 import jdk.jfr.Timestamp;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 
@@ -21,17 +20,17 @@ public class TestEntity {
 
     @Id
     @GeneratedValue
-    private Long test_id;
+    private Long testId;
 
-    private String test_content;
+    private String testContent;
 
     @CreationTimestamp
-    private LocalDateTime created_at;
+    private LocalDateTime createdAt;
 
     @Builder
-    public TestEntity(Long test_id, String test_content, LocalDateTime created_at) {
-        this.test_id = test_id;
-        this.test_content = test_content;
-        this.created_at = created_at;
+    public TestEntity(Long testId, String testContent, LocalDateTime createdAt) {
+        this.testId = testId;
+        this.testContent = testContent;
+        this.createdAt = createdAt;
     }
 }

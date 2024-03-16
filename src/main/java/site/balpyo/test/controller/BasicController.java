@@ -5,10 +5,9 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
+import site.balpyo.common.dto.CommonResponse;
 import site.balpyo.test.entity.TestEntity;
 import site.balpyo.test.repository.TestRepository;
-
-import java.time.LocalDate;
 import java.time.LocalTime;
 
 
@@ -22,25 +21,18 @@ public class BasicController {
         return "발표몇분 발표짱즈 빠이팅" + LocalTime.now();
     }
 
-    @GetMapping("/db_insert")
+    @GetMapping("/db-insert")
     public Object dbInsert() {
-        try {
             TestEntity testEntity = TestEntity.builder()
-                    .test_content("data")
+                    .testContent("testing")
                     .build();
             testRepository.save(testEntity);
-            return testEntity;
-        } catch (Exception e) {
-            return (e);
-        }
+            return CommonResponse.success(testEntity);
     }
 
-    @GetMapping("/db_read")
+    @GetMapping("/db-read")
     public Object dbRead() {
-        try {
             return testRepository.findAll();
-        } catch (Exception e) {
-            return (e);
-        }
     }
+
 }
