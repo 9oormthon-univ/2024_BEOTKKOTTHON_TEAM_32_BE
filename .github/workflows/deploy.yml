@@ -8,6 +8,10 @@ on:
     branches:
       - main
 
+env:
+  PROJECT_NAME: balpyo-server
+  RESOURCE_PATH: /home/runner/work/2024_BEOTKKOTTHON_TEAM_32_BE/2024_BEOTKKOTTHON_TEAM_32_BE/src/main/resources
+
 permissions:
   contents: read
   checks: write
@@ -28,6 +32,18 @@ jobs:
 
       - name: Make gradlew executable
         run: chmod +x ./gradlew
+
+      # Decrypt the encrypted application-secret.yml file
+      - name: Decrypt application-prod yml
+        run: gpg --quiet --batch --yes --always-trust --decrypt --passphrase=${{ secrets.APPLICATION_PROD_YML }} --output $RESOURCE_PATH/application.tar $RESOURCE_PATH/application.tar.gpg
+        shell: bash
+
+      # Unzip the application.tar file
+      - name: Unzip application.tar file to application-prod.yml
+        run: |
+          cd $RESOURCE_PATH 
+          tar xvf application.tar
+        shell: bash
 
       - name: Build with Gradle
         run: ./gradlew build -x test
@@ -54,8 +70,8 @@ jobs:
           context: .
           file: ./Dockerfile
           push: true
-          tags: ${{ secrets.NCP_CONTAINER_REGISTRY }}/balpyo-server:latest
-          cache-from: type=registry,ref=${{ secrets.NCP_CONTAINER_REGISTRY }}/balpyo-server:latest
+          tags: ${{ secrets.NCP_CONTAINER_REGISTRY }}/$PROJECT_NAME:latest
+          cache-from: type=registry,ref=${{ secrets.NCP_CONTAINER_REGISTRY }}/#PROJECT_NAME:latest
           cache-to: type=inline
           secrets: |
             GIT_AUTH_TOKEN=${{ secrets.GIT_TOKEN }}
@@ -70,7 +86,7 @@ jobs:
           script: |
             echo "${{ secrets.NCP_SECRET_KEY }}" | docker login -u ${{ secrets.NCP_ACCESS_KEY }} --password-stdin ${{ secrets.NCP_CONTAINER_REGISTRY }}
             
-            latest_tag=$(docker pull --quiet ${{ secrets.NCP_CONTAINER_REGISTRY }}/balpyo-server:latest | grep -oP "(?<=digest: ).*")
+            latest_tag=$(docker pull --quiet ${{ secrets.NCP_CONTAINER_REGISTRY }}/$PROJECT_NAME:latest | grep -oP "(?<=digest: ).*")
             
             echo "-----------------Latest tag found: ${{ secrets.LATEST_TAG }}"
             
@@ -82,7 +98,7 @@ jobs:
             fi
 
             docker run -d -p 443:443 
-            ${{ secrets.NCP_CONTAINER_REGISTRY }}/balpyo-server:${{ secrets.LATEST_TAG }}
+            ${{ secrets.NCP_CONTAINER_REGISTRY }}/$PROJECT_NAME:${{ secrets.LATEST_TAG }}
             
             
             docker image prune -f
