@@ -8,6 +8,9 @@ on:
     branches:
       - main
 
+env:
+  RESOURCE_PATH: /home/runner/work/2024_BEOTKKOTTHON_TEAM_32_BE/2024_BEOTKKOTTHON_TEAM_32_BE/src/main/resources
+
 permissions:
   contents: read
   checks: write
@@ -29,8 +32,26 @@ jobs:
       - name: Make gradlew executable
         run: chmod +x ./gradlew
 
+      # Decrypt the encrypted application-secret.yml file
+      - name: Decrypt application-prod yml
+        run: gpg --quiet --batch --yes --always-trust --decrypt --passphrase=${{ secrets.APPLICATION_PROD_YML }} --output $RESOURCE_PATH/application.tar $RESOURCE_PATH/application.tar.gpg
+        shell: bash
+
+      # Unzip the application.tar file
+      - name: Unzip application.tar file to application-prod.yml
+        run: |
+          cd $RESOURCE_PATH 
+          tar xvf application.tar
+        shell: bash
+
       - name: Build with Gradle
         run: ./gradlew build -x test
+
+      - name: Prepare keystore
+        run: echo "${{ secrets.KEYSTORE }}" > keystore.p12
+
+      - name: Move keystore file to Docker build context
+        run: mv keystore.p12 src/main/resources/
 
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
