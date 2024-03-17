@@ -32,6 +32,12 @@ jobs:
       - name: Build with Gradle
         run: ./gradlew build -x test
 
+      - name: Prepare keystore
+        run: echo "${{ secrets.KEYSTORE }}" > keystore.p12
+
+      - name: Move keystore file to Docker build context
+        run: mv keystore.p12 src/main/resources/
+
       - name: Set up Docker Buildx
         uses: docker/setup-buildx-action@v2
 
