@@ -23,6 +23,7 @@ public class AIGenerateUtils {
                 "\n" +
                 "I want you to act as a presenter specialized in "+ topic +" My first request is for you to generate a script:\n" +
                 "\n" +
+                "Make a script by calculating 150ms per syllable except spaces and commas" +
                 "Here's some context:\n" +
                 "Topic - " + topic +"\n" +
                 "Keywords - " + keywords +"\n" +
@@ -51,6 +52,14 @@ public class AIGenerateUtils {
     }
 
 
-
+//    public ResponseEntity<>Map> requestGPTTextToSpeech(){
+//
+//        HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
+//
+//        RestTemplate restTemplate = new RestTemplate();
+//        ResponseEntity<Map> response = restTemplate.postForEntity(ENDPOINT, requestEntity, Map.class);
+//
+//        return new response;
+//    }
 
 }
