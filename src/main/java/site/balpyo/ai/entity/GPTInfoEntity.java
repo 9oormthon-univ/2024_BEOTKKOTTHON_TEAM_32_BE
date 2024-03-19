@@ -50,13 +50,14 @@ public class GPTInfoEntity {
         ObjectMapper mapper = new ObjectMapper();
         GPTResponse response = mapper.convertValue(resultBody, GPTResponse.class);
 
+
         return GPTInfoEntity.builder()
                 .gptInfoId(response.getGptInfoId())
                 .gptObject(response.getGptObject())
                 .gptModel(response.getGptModel())
                 .gptCreatedAt(response.getGptCreatedAt())
                 .promptToken(response.getUsage().getPromptToken())
-                .gptGeneratedScript(response.getGptGeneratedScript().get(0).toString())
+                .gptGeneratedScript(response.getGptGeneratedScript().get(0).getMessage().getContent().toString())
                 .completionToken(response.getUsage().getCompletionToken())
                 .totalToken(response.getUsage().getTotalToken())
                 .build();

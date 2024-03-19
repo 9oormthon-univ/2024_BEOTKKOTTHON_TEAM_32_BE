@@ -10,13 +10,14 @@ import org.springframework.stereotype.Component;
 import org.springframework.web.client.RestTemplate;
 import site.balpyo.ai.dto.GPTResponse;
 
+import java.util.Arrays;
 import java.util.HashMap;
 import java.util.Map;
 
 @Component
 public class AIGenerateUtils {
 
-    private static final String ENDPOINT = "https://api.openai.com/v1/completions";
+    private static final String ENDPOINT = "https://api.openai.com/v1/chat/completions";
 
     public String createPromptString(String topic, String keywords , Integer sec){
         return "Ignore all previous instructions. \n" +
@@ -37,11 +38,14 @@ public class AIGenerateUtils {
         headers.setContentType(MediaType.APPLICATION_JSON);
         headers.set("Authorization", "Bearer " + API_KEY);
 
+        Map<String, Object> message = new HashMap<>();
+        message.put("role", "user");
+        message.put("content", prompt);
+
         Map<String, Object> requestBody = new HashMap<>();
-        requestBody.put("model","gpt-3.5-turbo-instruct");
-        requestBody.put("prompt", prompt);
+        requestBody.put("model", "gpt-3.5-turbo");
+        requestBody.put("messages", Arrays.asList(message));
         requestBody.put("temperature", temperature);
-        requestBody.put("max_tokens", maxTokens);
 
         HttpEntity<Map<String, Object>> requestEntity = new HttpEntity<>(requestBody, headers);
 
