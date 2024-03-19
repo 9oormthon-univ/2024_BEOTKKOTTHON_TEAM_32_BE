@@ -52,7 +52,7 @@ public class AIGenerateService {
         AIGenerateLogEntity aiGenerateLog = new AIGenerateLogEntity().convertToEntity(request , gptInfoData);
         aiGenerateLogRepository.save(aiGenerateLog); //저장
 
-        return CommonResponse.success(generatedScriptObject);
+        return CommonResponse.success(resultScript);
     }
 
 
