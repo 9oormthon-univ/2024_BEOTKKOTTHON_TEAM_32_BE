@@ -79,22 +79,23 @@ public class PollyService {
     }
 
 
+
     /**
      * mp3 audio 생성 시, 빠르기 설정 메소드
      */
     private static float calculateRelativeSpeed(int speed) {
         // 기본 속도
-        float baseSpeed = 1.0f;
+        float baseSpeed = 1.1f;
 
         switch (speed) {
             case -2:
-                return baseSpeed * 0.5f;
+                return baseSpeed * 1.025f;
             case -1:
-                return baseSpeed * 0.8f;
+                return baseSpeed * 1.05f;
             case 1:
-                return baseSpeed * 1.2f;
+                return baseSpeed * 1.125f;
             case 2:
-                return baseSpeed * 1.5f;
+                return baseSpeed * 1.15f;
             default:
                 return baseSpeed;
         }
