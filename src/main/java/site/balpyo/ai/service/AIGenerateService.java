@@ -40,7 +40,7 @@ public class AIGenerateService {
         //1. 주제, 소주제, 시간을 기반으로 프롬프트 생성
         String currentPromptString = aiGenerateUtils.createPromptString(request.getTopic(), request.getKeywords(), request.getSecTime());
         //2. 작성된 프롬프트를 기반으로 GPT에게 대본작성 요청
-        ResponseEntity<Map> generatedScriptObject = aiGenerateUtils.requestGPTTextGeneration(currentPromptString, 0.5f, 4000, CURRENT_GPT_API_KEY);
+        ResponseEntity<Map> generatedScriptObject = aiGenerateUtils.requestGPTTextGeneration(currentPromptString, 0.5f, 9000, CURRENT_GPT_API_KEY);
         //3. GPT응답을 기반으로 대본 추출 + 대본이 없다면 대본 생성 실패 에러 반환
         Object resultScript = generatedScriptObject.getBody().get("choices"); if(CommonUtils.isAnyParameterNullOrBlank(resultScript)) return CommonResponse.error(ErrorEnum.GPT_GENERATION_ERROR);
 
