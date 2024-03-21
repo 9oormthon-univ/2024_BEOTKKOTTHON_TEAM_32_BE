@@ -1,15 +1,13 @@
-package site.balpyo.user.entity;
+package site.balpyo.guest.entity;
 
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
-import site.balpyo.ai.entity.GPTInfoEntity;
 import site.balpyo.script.entity.ScriptEntity;
 
 import javax.persistence.*;
-import java.rmi.server.UID;
 import java.time.LocalDateTime;
 import java.util.List;
 
@@ -22,7 +20,6 @@ import java.util.List;
 public class GuestEntity {
 
     @Id
-    @GeneratedValue
     private String uid;
 
     @CreationTimestamp

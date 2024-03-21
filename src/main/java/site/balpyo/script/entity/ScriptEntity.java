@@ -6,11 +6,9 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import site.balpyo.ai.entity.AIGenerateLogEntity;
-import site.balpyo.ai.entity.GPTInfoEntity;
-import site.balpyo.user.entity.GuestEntity;
+import site.balpyo.guest.entity.GuestEntity;
 
 import javax.persistence.*;
-import java.rmi.server.UID;
 import java.time.LocalDateTime;
 
 @Data
@@ -32,7 +30,7 @@ public class ScriptEntity {
     private AIGenerateLogEntity aiGenerateLogEntity;
 
     @ManyToOne(fetch = FetchType.LAZY)
-    @JoinColumn(name = "guest_id")
+    @JoinColumn(name = "uid")
     private GuestEntity guestEntity;
 
 

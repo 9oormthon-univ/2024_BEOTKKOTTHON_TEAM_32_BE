@@ -7,7 +7,6 @@ import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import site.balpyo.ai.dto.AIGenerateRequest;
 import site.balpyo.script.entity.ScriptEntity;
-import site.balpyo.user.entity.GuestEntity;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
