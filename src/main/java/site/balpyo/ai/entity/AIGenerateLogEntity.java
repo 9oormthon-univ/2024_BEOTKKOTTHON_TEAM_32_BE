@@ -6,6 +6,8 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 import org.hibernate.annotations.CreationTimestamp;
 import site.balpyo.ai.dto.AIGenerateRequest;
+import site.balpyo.script.entity.ScriptEntity;
+import site.balpyo.user.entity.GuestEntity;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
@@ -33,6 +35,10 @@ public class AIGenerateLogEntity {
     @OneToOne(cascade = CascadeType.ALL)
     @JoinColumn(name = "gpt_info_id", referencedColumnName = "gptInfoId")
     private GPTInfoEntity gptInfoEntity;
+
+    @OneToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "script_id")
+    private ScriptEntity scriptEntity;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
