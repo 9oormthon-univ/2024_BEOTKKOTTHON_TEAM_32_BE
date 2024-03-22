@@ -1,9 +1,6 @@
 package site.balpyo.script.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import site.balpyo.ai.entity.AIGenerateLogEntity;
 import site.balpyo.guest.entity.GuestEntity;
@@ -11,7 +8,8 @@ import site.balpyo.guest.entity.GuestEntity;
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "script")
 @Builder
@@ -33,10 +31,11 @@ public class ScriptEntity {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    @OneToOne(mappedBy = "scriptEntity", cascade = CascadeType.ALL, fetch = FetchType.LAZY, optional = false)
+    @OneToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
+    @JoinColumn(name = "ai_log_id")
     private AIGenerateLogEntity aiGenerateLogEntity;
 
-    @ManyToOne(fetch = FetchType.LAZY)
+    @ManyToOne(fetch = FetchType.LAZY, cascade = CascadeType.ALL)
     @JoinColumn(name = "uid")
     private GuestEntity guestEntity;
 

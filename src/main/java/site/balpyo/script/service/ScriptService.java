@@ -12,6 +12,7 @@ import site.balpyo.common.dto.CommonResponse;
 import site.balpyo.guest.entity.GuestEntity;
 import site.balpyo.guest.repository.GuestRepository;
 import site.balpyo.script.dto.ScriptRequest;
+import site.balpyo.script.dto.ScriptResponse;
 import site.balpyo.script.entity.ScriptEntity;
 import site.balpyo.script.repository.ScriptRepository;
 
@@ -28,24 +29,37 @@ public class ScriptService {
     private final GPTInfoRepository gptInfoRepository;
 
 
-    public ResponseEntity<CommonResponse> saveScript(ScriptRequest scriptRequest) {
+    public ResponseEntity<CommonResponse> saveScript(ScriptRequest scriptRequest, String uid) {
 
+        GuestEntity guestEntity = null;
+        if (uid != null) {
+            guestEntity = guestRepository.findById(uid).orElse(null);
+        }
 
-        Optional<GuestEntity> guestEntity = guestRepository.findById(scriptRequest.getUid());
-        Optional<GPTInfoEntity> gptInfoEntity = gptInfoRepository.findById(scriptRequest.getGptId());
-        Optional<AIGenerateLogEntity> aiGenerateLogEntity = aiGenerateLogRepository.findByGptInfoEntity(gptInfoEntity.get());
+        GPTInfoEntity gptInfoEntity = null;
+        if (scriptRequest.getGptId() != null) {
+            gptInfoEntity = gptInfoRepository.findById(scriptRequest.getGptId()).orElse(null);
+        }
 
+        AIGenerateLogEntity aiGenerateLogEntity = null;
+        if (gptInfoEntity != null) {
+            Optional<AIGenerateLogEntity> aiGenerateLogEntityOptional = aiGenerateLogRepository.findByGptInfoEntity(gptInfoEntity);
+            aiGenerateLogEntity = aiGenerateLogEntityOptional.orElse(null);
+            System.out.println(aiGenerateLogEntity.getTopic());
+        }
 
         ScriptEntity scriptEntity = ScriptEntity.builder()
                 .title(scriptRequest.getTitle())
                 .script(scriptRequest.getScript())
                 .secTime(scriptRequest.getSecTime())
-                .guestEntity(guestEntity.get())
-                .aiGenerateLogEntity(aiGenerateLogEntity.get())
+                .guestEntity(guestEntity)
+                .aiGenerateLogEntity(aiGenerateLogEntity)
                 .build();
 
         scriptRepository.save(scriptEntity);
 
-        return CommonResponse.success(scriptEntity);
+        ScriptResponse scriptResponse = new ScriptResponse(scriptRequest.getScript(), scriptRequest.getGptId(),uid,scriptRequest.getTitle(),scriptRequest.getSecTime());
+
+        return CommonResponse.success(scriptResponse);
     }
 }

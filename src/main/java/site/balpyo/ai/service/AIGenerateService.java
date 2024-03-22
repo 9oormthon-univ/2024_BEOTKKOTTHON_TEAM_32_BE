@@ -7,6 +7,7 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
 import site.balpyo.ai.dto.AIGenerateRequest;
+import site.balpyo.ai.dto.AIGenerateResponse;
 import site.balpyo.ai.entity.AIGenerateLogEntity;
 import site.balpyo.ai.entity.GPTInfoEntity;
 import site.balpyo.ai.repository.AIGenerateLogRepository;
@@ -14,8 +15,14 @@ import site.balpyo.ai.repository.GPTInfoRepository;
 import site.balpyo.common.dto.CommonResponse;
 import site.balpyo.common.dto.ErrorEnum;
 import site.balpyo.common.util.CommonUtils;
+import site.balpyo.guest.entity.GuestEntity;
+import site.balpyo.guest.repository.GuestRepository;
 
+import javax.transaction.Transactional;
+import java.lang.reflect.Array;
+import java.util.List;
 import java.util.Map;
+import java.util.Optional;
 
 @Service
 @RequiredArgsConstructor
@@ -26,10 +33,13 @@ public class AIGenerateService {
 
     private final AIGenerateLogRepository aiGenerateLogRepository;
 
+    private final GuestRepository guestRepository;
+
 
     @Value("${secrets.GPT_API_KEY}")
     public String GPT_API_KEY;
-    public ResponseEntity<CommonResponse> generateScript(AIGenerateRequest request){
+    @Transactional
+    public ResponseEntity<CommonResponse> generateScript(AIGenerateRequest request,String uid){
 
         // TODO :: TEST인 경우 TEST값 반환 <- 개발 완료 후 삭제 예정
         if(request.isTest()) return CommonResponse.success(new GPTTestObject().getGPTTestObject());
@@ -48,11 +58,24 @@ public class AIGenerateService {
         Object resultBody = generatedScriptObject.getBody();
         //5. GPT 응답에서 GPTInfoEntity 추출 및 jpa로 저장할 수 있도록 GPTInfoEntity로변환
         GPTInfoEntity gptInfoData = new GPTInfoEntity().ResponseBodyToGPTInfoEntity(resultBody);
-        //6. AI 사용기록에 gpt정보와 요청값들을 AIGenerateLogEntity형태로 변환
-        AIGenerateLogEntity aiGenerateLog = new AIGenerateLogEntity().convertToEntity(request , gptInfoData);
-        aiGenerateLogRepository.save(aiGenerateLog); //저장
 
-        return CommonResponse.success(resultScript);
+
+        GuestEntity guestEntity = null;
+        Optional<GuestEntity> optionalGuestEntity= guestRepository.findById(uid);
+        if(optionalGuestEntity.isPresent()){
+            guestEntity = optionalGuestEntity.get();
+        }
+
+        //6. AI 사용기록에 gpt정보와 요청값들을 AIGenerateLogEntity형태로 변환
+        AIGenerateLogEntity aiGenerateLog = new AIGenerateLogEntity().convertToEntity(request , gptInfoData,guestEntity);
+
+
+
+        aiGenerateLogRepository.save(aiGenerateLog); //저장
+        String GPTId = aiGenerateLog.getGptInfoEntity().getGptInfoId();
+
+
+        return CommonResponse.success(new AIGenerateResponse(resultScript,GPTId));
     }
 
 
