@@ -1,16 +1,16 @@
 package site.balpyo.ai.entity;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import site.balpyo.ai.dto.AIGenerateRequest;
+import site.balpyo.guest.entity.GuestEntity;
+import site.balpyo.script.entity.ScriptEntity;
 
 import javax.persistence.*;
 import java.time.LocalDateTime;
 
-@Data
+@Getter
+@Setter
 @Entity
 @Table(name = "ai_generate_log")
 @Builder
@@ -30,20 +30,28 @@ public class AIGenerateLogEntity {
 
     private double secPerLetter;
 
-    @OneToOne(cascade = CascadeType.ALL)
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "uid")
+    private GuestEntity guestEntity;
+
+    @OneToOne(fetch = FetchType.LAZY,cascade = CascadeType.ALL)
     @JoinColumn(name = "gpt_info_id", referencedColumnName = "gptInfoId")
     private GPTInfoEntity gptInfoEntity;
+
+    @OneToOne(fetch = FetchType.LAZY, mappedBy = "aiGenerateLogEntity", cascade = CascadeType.ALL)
+    private ScriptEntity scriptEntity;
 
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    public AIGenerateLogEntity convertToEntity(AIGenerateRequest aiGenerateRequest, GPTInfoEntity gptInfoEntity){
+    public AIGenerateLogEntity convertToEntity(AIGenerateRequest aiGenerateRequest, GPTInfoEntity gptInfoEntity,GuestEntity guestEntity){
         return AIGenerateLogEntity.builder()
                 .secTime(aiGenerateRequest.getSecTime())
                 .topic(aiGenerateRequest.getTopic())
                 .keywords(aiGenerateRequest.getKeywords())
                 .secPerLetter(0) // TODO :: 차후 0 값 변경
                 .gptInfoEntity(gptInfoEntity)
+                .guestEntity(guestEntity)
                 .build();
     }
 
