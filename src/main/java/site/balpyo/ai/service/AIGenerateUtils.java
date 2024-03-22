@@ -19,19 +19,20 @@ public class AIGenerateUtils {
 
     private static final String ENDPOINT = "https://api.openai.com/v1/chat/completions";
 
-    public String createPromptString(String topic, String keywords , Integer sec){
+    public String createPromptString(String topic, String keywords, Integer sec) {
         return "Ignore all previous instructions. \n" +
                 "\n" +
-                "I want you to act as a presenter specialized in "+ topic +" My first request is for you to generate a script:\n" +
+                "I want you to act as a presenter specialized in " + topic + ". My first request is for you to generate a script:\n" +
                 "\n" +
-                "Make a script by calculating 150ms per syllable except spaces and commas" +
+                "Make a script by calculating 150ms per syllable, including spaces, and 250ms for line breaks, commas, and periods." +
                 "Here's some context:\n" +
-                "Topic - " + topic +"\n" +
-                "Keywords - " + keywords +"\n" +
-                "amount - "+sec + "sec"+
+                "Topic - " + topic + "\n" +
+                "Keywords - " + keywords + "\n" +
+                "Amount - " + sec + " sec" +
                 "\n" +
                 "Please write in Korean.";
     }
+
 
     public ResponseEntity<Map> requestGPTTextGeneration(String prompt, float temperature, int maxTokens ,String API_KEY) {
         HttpHeaders headers = new HttpHeaders();
