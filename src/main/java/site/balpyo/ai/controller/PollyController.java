@@ -27,7 +27,7 @@ import java.io.InputStream;
 @RestController
 @Slf4j
 @RequiredArgsConstructor
-@RequestMapping("/api/polly")
+@RequestMapping("/polly")
 public class PollyController {
 
     @Value("${secrets.BALPYO_API_KEY}") //TODO :: 임시 api 시크릿 키 구현 (차후 로그인 연동시 삭제예정)
@@ -68,30 +68,4 @@ public class PollyController {
         }
     }
 
-
-    /**
-     * 입력한 대본을 음성 파일 변환 시, 음절당 기준값에 따라 계산된 소요시간을 반환한다.
-     * @param pollyDTO
-     * @return
-     */
-    @PostMapping("/estimateDuration")
-    public ResponseEntity<CommonResponse> estimateSpeechDuration(@RequestBody PollyDTO pollyDTO) {
-
-        if (!BALPYO_API_KEY.equals(pollyDTO.getBalpyoAPIKey())) {
-            return CommonResponse.error(ErrorEnum.BALPYO_API_KEY_ERROR);
-        }
-
-        String inputText = pollyDTO.getText();
-
-        try {
-            int durationInSeconds = pollyService.estimateSpeechDuration(inputText);
-
-
-            return CommonResponse.success(durationInSeconds);
-
-        } catch (Exception e) {
-            e.printStackTrace();
-            return CommonResponse.error(ErrorEnum.INTERNAL_SERVER_ERROR);
-        }
-    }
 }
