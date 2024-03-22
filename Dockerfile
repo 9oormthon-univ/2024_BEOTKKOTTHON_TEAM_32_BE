@@ -8,9 +8,6 @@ WORKDIR /app
 # 컨테이너의 파일시스템에 빌드된 jar파일 복사
 COPY build/libs/balpyo-0.0.1-SNAPSHOT.jar /app/balpyo-0.0.1-SNAPSHOT.jar
 
-# keystore 파일 복사
-COPY src/main/resources/keystore.p12 /app/keystore.p12
-
 # 앱 실행을 위한 사용자 계정 생성
 RUN addgroup --system dockeruser && adduser --system --ingroup dockeruser dockeruser
 
@@ -21,7 +18,7 @@ RUN chown -R dockeruser:dockeruser /app
 USER dockeruser
 
 # 노출할 포트 명시
-EXPOSE 443
+EXPOSE 8080
 
 # always do command
 ENTRYPOINT ["java","-jar","/app/balpyo-0.0.1-SNAPSHOT.jar"]
