@@ -13,7 +13,7 @@ import site.balpyo.script.service.ScriptService;
 @RestController
 @CrossOrigin
 @RequiredArgsConstructor
-@RequestMapping("/every")
+@RequestMapping("/every/manage")
 public class EveryScriptController {
 
     private final ScriptService scriptService;
