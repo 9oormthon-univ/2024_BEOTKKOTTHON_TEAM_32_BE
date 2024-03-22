@@ -23,6 +23,13 @@ public class ScriptEntity {
     @GeneratedValue
     private Long script_id;
 
+    @Lob
+    private String script;
+
+    private String title;
+
+    private Integer secTime;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 

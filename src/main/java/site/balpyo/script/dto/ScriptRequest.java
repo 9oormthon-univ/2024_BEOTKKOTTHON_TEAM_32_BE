@@ -9,6 +9,7 @@ import lombok.Data;
 public class ScriptRequest {
     private String script;
     private String gptId;
+    private String uid;
     private String title;
     private Integer secTime;
 }
