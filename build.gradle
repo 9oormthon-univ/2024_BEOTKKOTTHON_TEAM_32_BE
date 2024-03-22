@@ -32,10 +32,14 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter-validation'
 	implementation 'com.fasterxml.jackson.core:jackson-databind:2.14.1'
 
-	// https://mvnrepository.com/artifact/com.amazonaws/aws-java-sdk-polly
+
+	implementation(platform("software.amazon.awssdk:bom:2.21.1"))
+
 	implementation 'com.amazonaws:aws-java-sdk-polly:1.12.681'
+//	implementation 'org.springframework.cloud:spring-cloud-starter-aws:2.2.6.RELEASE'
+	implementation 'io.awspring.cloud:spring-cloud-starter-aws:2.4.2'
 
-
+	implementation 'javax.xml.bind:jaxb-api:2.3.1'
 }
 
 tasks.named('test') {
