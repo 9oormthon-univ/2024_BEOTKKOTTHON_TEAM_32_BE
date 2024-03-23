@@ -7,7 +7,7 @@ import lombok.*;
 @Builder
 @AllArgsConstructor
 public class ScriptResponse {
-
+        
         private Long scriptId;
         private String script;
         private String gptId;

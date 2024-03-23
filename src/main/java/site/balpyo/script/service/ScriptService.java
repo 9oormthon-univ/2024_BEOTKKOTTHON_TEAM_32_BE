@@ -61,12 +61,12 @@ public class ScriptService {
 
         scriptRepository.save(scriptEntity);
 
-        ScriptResponse scriptResponse = new ScriptResponse(scriptRequest.getScript(), scriptRequest.getGptId(),uid,scriptRequest.getTitle(),scriptRequest.getSecTime());
+        ScriptResponse scriptResponse = new ScriptResponse(null,scriptRequest.getScript(), scriptRequest.getGptId(),uid,scriptRequest.getTitle(),scriptRequest.getSecTime());
 
         return CommonResponse.success(scriptResponse);
     }
 
-    public ResponseEntity<CommonResponse> getScript(String uid) {
+    public ResponseEntity<CommonResponse> getAllScript(String uid) {
         Optional<GuestEntity> guestEntity = guestRepository.findById(uid);
 
         if(guestEntity.isEmpty())return CommonResponse.error(ErrorEnum.GUEST_NOT_FOUND);
@@ -76,17 +76,38 @@ public class ScriptService {
 
         List<ScriptResponse> scriptResponses = new ArrayList<>();
         for(ScriptEntity scriptEntity: scriptEntities){
-            ScriptResponse scriptResponse = ScriptResponse.builder()
-                    .scriptId(scriptEntity.getScript_id())
-                    .uid(uid)
-                    .title(scriptEntity.getTitle())
-                    .secTime(scriptEntity.getSecTime())
-                    .build();
+              ScriptResponse scriptResponse = ScriptResponse.builder()
+                .scriptId(scriptEntity.getScript_id())
+                .uid(uid)
+                .title(scriptEntity.getTitle())
+                .secTime(scriptEntity.getSecTime())
+                .build();
 
-            scriptResponses.add(scriptResponse);
-        }
+        scriptResponses.add(scriptResponse);
+    }
 
         return CommonResponse.success(scriptResponses);
+
+    }
+
+    public ResponseEntity<CommonResponse> getDetailScript(String uid, Long scriptId) {
+        Optional<ScriptEntity> optionalScriptEntity = scriptRepository.findScriptByGuestUidAndScriptId(uid,scriptId);
+
+        if(optionalScriptEntity.isEmpty())return CommonResponse.error(ErrorEnum.SCRIPT_DETAIL_NOT_FOUND);
+
+        ScriptEntity scriptEntity = optionalScriptEntity.get();
+
+        ScriptResponse scriptResponse = ScriptResponse
+                .builder()
+                .scriptId(scriptEntity.getScript_id())
+                .secTime(scriptEntity.getSecTime())
+                .uid(scriptEntity.getGuestEntity().getUid())
+                .title(scriptEntity.getTitle())
+                .script(scriptEntity.getScript())
+                .build();
+
+        return CommonResponse.success(scriptResponse);
+
 
     }
 }

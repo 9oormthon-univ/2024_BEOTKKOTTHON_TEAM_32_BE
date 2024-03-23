@@ -9,7 +9,7 @@ public enum ErrorEnum {
 
     //6000 - Sript 계열 에러
     SCRIPT_NOT_FOUND("6001", "저장된 스크립트가 없습니다."),
-
+    SCRIPT_DETAIL_NOT_FOUND("6002", "해당 조건의 스크립트가 없습니다."),
     //7000 - Guest 계열에러
     GUEST_NOT_FOUND("7001", "존재하지 않는 게스트입니다."),
 
