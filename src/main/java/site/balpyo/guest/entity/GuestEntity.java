@@ -27,7 +27,7 @@ public class GuestEntity {
     @OneToMany(mappedBy = "guestEntity", cascade = CascadeType.ALL)
     private List<AIGenerateLogEntity> aiGenerateLogEntities;
 
-    @OneToMany(mappedBy = "guestEntity", cascade = CascadeType.ALL)
+    @OneToMany(mappedBy = "guestEntity")
     private List<ScriptEntity> scriptEntities;
 
     private Integer coin;
