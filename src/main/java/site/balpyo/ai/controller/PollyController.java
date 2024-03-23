@@ -3,6 +3,10 @@ package site.balpyo.ai.controller;
 import com.amazonaws.util.IOUtils;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jaudiotagger.audio.exceptions.CannotReadException;
+import org.jaudiotagger.audio.exceptions.InvalidAudioFrameException;
+import org.jaudiotagger.audio.exceptions.ReadOnlyFileException;
+import org.jaudiotagger.tag.TagException;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
 import org.springframework.http.HttpStatus;
@@ -79,7 +83,7 @@ public class PollyController {
     }
 
     @PostMapping("/uploadSpeech")
-    public ResponseEntity<UploadResultDTO> synthesizeAndUploadSpeech(@RequestBody PollyDTO pollyDTO) throws IOException {
+    public ResponseEntity<UploadResultDTO> synthesizeAndUploadSpeech(@RequestBody PollyDTO pollyDTO) throws IOException, CannotReadException, TagException, InvalidAudioFrameException, ReadOnlyFileException {
         UploadResultDTO uploadResultDTO = pollyService.synthesizeAndUploadSpeech(pollyDTO);
         HttpHeaders headers = new HttpHeaders();
         headers.setContentType(MediaType.APPLICATION_JSON);
