@@ -57,11 +57,12 @@ public class ScriptService {
                 .secTime(scriptRequest.getSecTime())
                 .guestEntity(guestEntity)
                 .aiGenerateLogEntity(aiGenerateLogEntity)
+                .voiceFilePath(scriptRequest.getVoiceFilePath())
                 .build();
 
         scriptRepository.save(scriptEntity);
 
-        ScriptResponse scriptResponse = new ScriptResponse(null,scriptRequest.getScript(), scriptRequest.getGptId(),uid,scriptRequest.getTitle(),scriptRequest.getSecTime());
+        ScriptResponse scriptResponse = new ScriptResponse(null,scriptRequest.getScript(), scriptRequest.getGptId(),uid,scriptRequest.getTitle(),scriptRequest.getSecTime(),null);
 
         return CommonResponse.success(scriptResponse);
     }
@@ -82,6 +83,7 @@ public class ScriptService {
                 .uid(uid)
                 .title(scriptEntity.getTitle())
                 .secTime(scriptEntity.getSecTime())
+                      .voiceFilePath(scriptEntity.getVoiceFilePath())
                 .build();
 
         scriptResponses.add(scriptResponse);
@@ -105,6 +107,7 @@ public class ScriptService {
                 .uid(scriptEntity.getGuestEntity().getUid())
                 .title(scriptEntity.getTitle())
                 .script(scriptEntity.getScript())
+                .voiceFilePath(scriptEntity.getVoiceFilePath())
                 .build();
 
         return CommonResponse.success(scriptResponse);
@@ -118,10 +121,16 @@ public class ScriptService {
 
         ScriptEntity scriptEntity = optionalScriptEntity.get();
 
+
         scriptEntity.setScript(scriptRequest.getScript());
         scriptEntity.setTitle(scriptRequest.getTitle());
         scriptEntity.setSecTime(scriptRequest.getSecTime());
 
+
+
+        if (scriptRequest.getVoiceFilePath() != null && !scriptRequest.getVoiceFilePath().isEmpty()) {
+            scriptEntity.setVoiceFilePath(scriptRequest.getVoiceFilePath());
+        }
 
         scriptRepository.save(scriptEntity);
 
