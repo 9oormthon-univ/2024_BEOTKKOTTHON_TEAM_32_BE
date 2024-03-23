@@ -30,4 +30,6 @@ public class GuestEntity {
     @OneToMany(mappedBy = "guestEntity", cascade = CascadeType.ALL)
     private List<ScriptEntity> scriptEntities;
 
+    private Integer coin;
+
 }

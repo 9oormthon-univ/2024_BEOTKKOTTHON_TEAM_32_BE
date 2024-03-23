@@ -9,5 +9,4 @@ public class UIDResponse {
 
     private String uid;
 
-
 }
