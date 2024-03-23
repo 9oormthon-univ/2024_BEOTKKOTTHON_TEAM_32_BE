@@ -26,13 +26,13 @@ import java.util.Optional;
 public class ScriptService {
 
     private final ScriptRepository scriptRepository;
-
     private final GuestRepository guestRepository;
     private final AIGenerateLogRepository aiGenerateLogRepository;
     private final GPTInfoRepository gptInfoRepository;
 
 
     public ResponseEntity<CommonResponse> saveScript(ScriptRequest scriptRequest, String uid) {
+
 
         GuestEntity guestEntity = null;
         if (uid != null) {
@@ -70,11 +70,12 @@ public class ScriptService {
         Optional<GuestEntity> guestEntity = guestRepository.findById(uid);
 
         if(guestEntity.isEmpty())return CommonResponse.error(ErrorEnum.GUEST_NOT_FOUND);
-        if(guestEntity.get().getScriptEntities().isEmpty())return CommonResponse.error(ErrorEnum.SCRIPT_NOT_FOUND);
+        List<ScriptResponse> scriptResponses = new ArrayList<>();
+        if(guestEntity.get().getScriptEntities().isEmpty())return CommonResponse.success(scriptResponses);
 
         List<ScriptEntity> scriptEntities = guestEntity.get().getScriptEntities();
 
-        List<ScriptResponse> scriptResponses = new ArrayList<>();
+
         for(ScriptEntity scriptEntity: scriptEntities){
               ScriptResponse scriptResponse = ScriptResponse.builder()
                 .scriptId(scriptEntity.getScript_id())
@@ -108,6 +109,38 @@ public class ScriptService {
 
         return CommonResponse.success(scriptResponse);
 
+
+    }
+    public ResponseEntity<CommonResponse> patchScript(ScriptRequest scriptRequest, String uid,Long scriptId) {
+        Optional<ScriptEntity> optionalScriptEntity = scriptRepository.findScriptByGuestUidAndScriptId(uid, scriptId);
+
+        if(optionalScriptEntity.isEmpty())return CommonResponse.error(ErrorEnum.SCRIPT_DETAIL_NOT_FOUND);
+
+        ScriptEntity scriptEntity = optionalScriptEntity.get();
+
+        scriptEntity.setScript(scriptRequest.getScript());
+        scriptEntity.setTitle(scriptRequest.getTitle());
+        scriptEntity.setSecTime(scriptRequest.getSecTime());
+
+
+        scriptRepository.save(scriptEntity);
+
+        return CommonResponse.success("");
+
+
+    }
+
+
+    public ResponseEntity<CommonResponse> deleteScript(String uid, Long scriptId) {
+        Optional<ScriptEntity> optionalScriptEntity = scriptRepository.findScriptByGuestUidAndScriptId(uid, scriptId);
+
+        if(optionalScriptEntity.isEmpty())return CommonResponse.error(ErrorEnum.SCRIPT_DETAIL_NOT_FOUND);
+
+        ScriptEntity scriptEntity = optionalScriptEntity.get();
+
+        scriptRepository.delete(scriptEntity);
+
+        return CommonResponse.success("");
 
     }
 }
