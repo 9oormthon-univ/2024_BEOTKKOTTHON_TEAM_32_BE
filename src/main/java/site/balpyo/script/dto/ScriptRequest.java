@@ -14,4 +14,5 @@ public class ScriptRequest {
     private String uid;
     private String title;
     private Integer secTime;
+    private String voiceFilePath;
 }

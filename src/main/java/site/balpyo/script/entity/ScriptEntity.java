@@ -28,6 +28,8 @@ public class ScriptEntity {
 
     private Integer secTime;
 
+    private String voiceFilePath;
+
     @CreationTimestamp
     private LocalDateTime createdAt;
 
