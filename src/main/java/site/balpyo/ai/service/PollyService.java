@@ -5,18 +5,33 @@ import com.amazonaws.regions.Regions;
 import com.amazonaws.services.polly.AmazonPolly;
 import com.amazonaws.services.polly.AmazonPollyClient;
 import com.amazonaws.services.polly.model.*;
+import com.amazonaws.services.s3.AmazonS3;
+import com.amazonaws.services.s3.model.AccessControlList;
+import com.amazonaws.services.s3.model.GroupGrantee;
+import com.amazonaws.services.s3.model.ObjectMetadata;
+import com.amazonaws.services.s3.model.Permission;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import site.balpyo.ai.dto.PollyDTO;
+import site.balpyo.ai.dto.upload.UploadResultDTO;
+import site.balpyo.common.s3.S3Client;
 
 import java.io.InputStream;
+import java.util.UUID;
 
 /**
  * @author dongheonlee
  */
 @Service
 @Slf4j
+@RequiredArgsConstructor
 public class PollyService {
+
+    @Value("${cloud.aws.s3.bucket}")
+    private String bucketName;
+    private final S3Client s3Client;
 
     /**
      * 입력된 텍스트와 선택된 빠르기에 따라 음성파일으로 변환하여 반환한다.
@@ -58,6 +73,7 @@ public class PollyService {
 
             log.info("-------------------- 요청된 문자열 개수 : " + synthesizeSpeechResult.getRequestCharacters());
             log.info("-------------------- 음성변환 요청 성공");
+
 
             return synthesizeSpeechResult.getAudioStream();
         } catch (AmazonPollyException e) {
@@ -121,5 +137,47 @@ public class PollyService {
         ssmlBuilder.append("</prosody>");
         ssmlBuilder.append("</speak>");
         return ssmlBuilder.toString();
+    }
+
+    public UploadResultDTO synthesizeAndUploadSpeech(PollyDTO pollyDTO) {
+        InputStream audioStream = synthesizeSpeech(pollyDTO); // 음성 파일 생성
+
+        // 파일 이름 생성
+        String fileName = UUID.randomUUID() + ".mp3";
+
+        log.info("--------------------- " + fileName);
+
+        // S3에 업로드
+        String profileUrl = uploadToS3(audioStream, fileName);
+
+        log.info("--------------------- " + profileUrl);
+
+
+        return UploadResultDTO.builder()
+                .profileUrl(profileUrl)
+                .build();
+    }
+
+    private String uploadToS3(InputStream inputStream, String fileName) {
+        String objectPath = "/" + fileName; // S3에 저장될 경로
+
+        // S3에 업로드
+        s3Client.getAmazonS3().putObject(bucketName, objectPath, inputStream, new ObjectMetadata());
+
+        // ACL 설정
+        setAcl(s3Client.getAmazonS3(), objectPath);
+
+        // 업로드된 파일의 URL 생성
+        String baseUploadURL = "https://balpyo-bucket.s3.ap-northeast-2.amazonaws.com/audio";
+
+        log.info("업로드 위치------" + baseUploadURL + objectPath);
+
+        return baseUploadURL + objectPath;
+    }
+
+    public void setAcl(AmazonS3 s3, String objectPath) {
+        AccessControlList objectAcl = s3.getObjectAcl(bucketName, objectPath);
+        objectAcl.grantPermission(GroupGrantee.AllUsers, Permission.Read);
+        s3.setObjectAcl(bucketName, objectPath, objectAcl);
     }
 }
