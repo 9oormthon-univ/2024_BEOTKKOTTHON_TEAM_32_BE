@@ -130,4 +130,16 @@ public class ScriptService {
     }
 
 
+    public ResponseEntity<CommonResponse> deleteScript(String uid, Long scriptId) {
+        Optional<ScriptEntity> optionalScriptEntity = scriptRepository.findScriptByGuestUidAndScriptId(uid, scriptId);
+
+        if(optionalScriptEntity.isEmpty())return CommonResponse.error(ErrorEnum.SCRIPT_DETAIL_NOT_FOUND);
+
+        ScriptEntity scriptEntity = optionalScriptEntity.get();
+
+        scriptRepository.delete(scriptEntity);
+
+        return CommonResponse.success("");
+
+    }
 }
