@@ -15,7 +15,6 @@ import java.util.Map;
 @Component
 @Slf4j
 public class AIGenerateUtils {
-
     private static final String ENDPOINT = "https://api.openai.com/v1/chat/completions";
 
     public String createPromptString(String topic, String keywords, Integer sec) {

@@ -26,13 +26,13 @@ import java.util.Optional;
 public class ScriptService {
 
     private final ScriptRepository scriptRepository;
-
     private final GuestRepository guestRepository;
     private final AIGenerateLogRepository aiGenerateLogRepository;
     private final GPTInfoRepository gptInfoRepository;
 
 
     public ResponseEntity<CommonResponse> saveScript(ScriptRequest scriptRequest, String uid) {
+
 
         GuestEntity guestEntity = null;
         if (uid != null) {
@@ -110,4 +110,24 @@ public class ScriptService {
 
 
     }
+    public ResponseEntity<CommonResponse> patchScript(ScriptRequest scriptRequest, String uid,Long scriptId) {
+        Optional<ScriptEntity> optionalScriptEntity = scriptRepository.findScriptByGuestUidAndScriptId(uid, scriptId);
+
+        if(optionalScriptEntity.isEmpty())return CommonResponse.error(ErrorEnum.SCRIPT_DETAIL_NOT_FOUND);
+
+        ScriptEntity scriptEntity = optionalScriptEntity.get();
+
+        scriptEntity.setScript(scriptRequest.getScript());
+        scriptEntity.setTitle(scriptRequest.getTitle());
+        scriptEntity.setSecTime(scriptRequest.getSecTime());
+
+
+        scriptRepository.save(scriptEntity);
+
+        return CommonResponse.success("");
+
+
+    }
+
+
 }
