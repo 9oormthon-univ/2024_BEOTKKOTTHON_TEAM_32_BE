@@ -44,6 +44,12 @@ public class AIGenerateLogEntity {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
+    @OneToOne(mappedBy = "aiGenerateLogEntity",
+            cascade = CascadeType.ALL,
+            fetch = FetchType.LAZY,
+            orphanRemoval = true)
+    private FlowAudio flowAudio;
+
     public AIGenerateLogEntity convertToEntity(AIGenerateRequest aiGenerateRequest, GPTInfoEntity gptInfoEntity,GuestEntity guestEntity){
         return AIGenerateLogEntity.builder()
                 .secTime(aiGenerateRequest.getSecTime())
