@@ -42,6 +42,8 @@ public class PollyController {
     @PostMapping("/generateAudio")
     public ResponseEntity<?> synthesizeText(@RequestBody PollyDTO pollyDTO) {
 
+        log.info("--------------------controller로 텍스트 음성 변환 요청");
+        
         if (!BALPYO_API_KEY.equals(pollyDTO.getBalpyoAPIKey())) {
             return CommonResponse.error(ErrorEnum.BALPYO_API_KEY_ERROR);
         }
@@ -49,6 +51,12 @@ public class PollyController {
         try {
             // Amazon Polly와 통합하여 텍스트를 음성으로 변환
             InputStream audioStream = pollyService.synthesizeSpeech(pollyDTO);
+
+
+            if (audioStream == null) {
+                log.error("Amazon Polly 음성 변환 실패: 반환된 오디오 스트림이 null입니다.");
+                return CommonResponse.error(ErrorEnum.INTERNAL_SERVER_ERROR);
+            }
 
             // InputStream을 byte 배열로 변환
             byte[] audioBytes = IOUtils.toByteArray(audioStream);
@@ -63,9 +71,10 @@ public class PollyController {
                     .body(audioBytes);
 
         } catch (IOException e) {
-            e.printStackTrace();
+            log.error("내부 서버 오류: " + e.getMessage());
             return CommonResponse.error(ErrorEnum.INTERNAL_SERVER_ERROR);
         }
     }
+
 
 }

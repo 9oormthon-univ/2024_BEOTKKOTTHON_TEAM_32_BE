@@ -29,6 +29,9 @@ public class PollyService {
         String inputText = pollyDTO.getText();
         int speed = pollyDTO.getSpeed();
 
+        log.info("-------------------- 클라이언트가 요청한 대본 :" + inputText);
+        log.info("-------------------- 클라이언트가 요청한 빠르기 :" + speed);
+
         // Amazon Polly 클라이언트 생성
         AmazonPolly amazonPolly = AmazonPollyClient.builder()
                 .withRegion(Regions.AP_NORTHEAST_2) // 서울 리전
@@ -38,20 +41,30 @@ public class PollyService {
         // 빠르기 계산
         float relativeSpeed = calculateRelativeSpeed(speed);
 
-        // SynthesizeSpeechRequest 생성
+        log.info("-------------------- 선택한 빠르기 :" + relativeSpeed);
+
+        // SSML 텍스트 생성
+        String ssmlText = buildSsmlText(inputText, relativeSpeed);
+
+        // SynthesizeSpeechRequest 생성 및 설정
         SynthesizeSpeechRequest synthesizeSpeechRequest = new SynthesizeSpeechRequest()
-                .withText(inputText)
+                .withText(ssmlText)
                 .withOutputFormat(OutputFormat.Mp3) // MP3 형식
                 .withVoiceId(VoiceId.Seoyeon) // 한국어 음성 변환 보이스
-                .withTextType("ssml") // SSML 형식 사용 -> <prosody> 태그와 rate로 설정 가능
-                .withText("<speak><prosody rate=\"" + relativeSpeed + "\">" + inputText + "</prosody></speak>");
+                .withTextType("ssml"); // SSML 형식 사용
+        
+        try { // 텍스트를 음성으로 변환하여 InputStream으로 반환
+            SynthesizeSpeechResult synthesizeSpeechResult = amazonPolly.synthesizeSpeech(synthesizeSpeechRequest);
 
-        // 텍스트를 음성으로 변환하여 InputStream으로 반환
-        SynthesizeSpeechResult synthesizeSpeechResult = amazonPolly.synthesizeSpeech(synthesizeSpeechRequest);
-        return synthesizeSpeechResult.getAudioStream();
+            log.info("-------------------- 요청된 문자열 개수 : " + synthesizeSpeechResult.getRequestCharacters());
+            log.info("-------------------- 음성변환 요청 성공");
+
+            return synthesizeSpeechResult.getAudioStream();
+        } catch (AmazonPollyException e) {
+            log.error("-------------------- 음성 변환 실패: " + e.getErrorMessage());
+            throw e;
+        }
     }
-
-
 
     /**
      * mp3 audio 생성 시, 빠르기 설정 메소드
@@ -74,5 +87,39 @@ public class PollyService {
         }
     }
 
+    /**
+     * SSML 텍스트 생성 메소드
+     */
+    private String buildSsmlText(String inputText, float relativeSpeed) {
+        StringBuilder ssmlBuilder = new StringBuilder();
+        ssmlBuilder.append("<speak>");
+        ssmlBuilder.append(String.format("<prosody rate=\"%f%%\">", relativeSpeed * 100));
 
+        for (char ch : inputText.toCharArray()) {
+            switch (ch) {
+                case ',':
+                    // 쉼표일 때 숨쉬기 태그 추가
+                    ssmlBuilder.append("<break time=\"500ms\"/>");
+                    break;
+                case '.':
+                case '!':
+                    ssmlBuilder.append("<break time=\"600ms\"/>");
+                    break;
+                case '?':
+                    ssmlBuilder.append("<break time=\"800ms\"/>");
+                case '\n':
+                    // 마침표나 개행 문자일 때 조금 더 긴 일시정지
+                    ssmlBuilder.append("<break time=\"300ms\"/>");
+                    break;
+                default:
+                    // 기본 문자 처리
+                    ssmlBuilder.append(ch);
+                    break;
+            }
+        }
+
+        ssmlBuilder.append("</prosody>");
+        ssmlBuilder.append("</speak>");
+        return ssmlBuilder.toString();
+    }
 }
