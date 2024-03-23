@@ -12,12 +12,15 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.Permission;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jaudiotagger.audio.AudioFile;
+import org.jaudiotagger.audio.AudioFileIO;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import site.balpyo.ai.dto.PollyDTO;
 import site.balpyo.ai.dto.upload.UploadResultDTO;
 import site.balpyo.common.s3.S3Client;
 
+import java.io.File;
 import java.io.InputStream;
 import java.util.UUID;
 
@@ -155,25 +158,59 @@ public class PollyService {
 
         return UploadResultDTO.builder()
                 .profileUrl(profileUrl)
+//                .playTime(playTime)
                 .build();
     }
 
     private String uploadToS3(InputStream inputStream, String fileName) {
-        String objectPath = "/" + fileName; // S3에 저장될 경로
+
+        log.info("--------------------- " + fileName);
 
         // S3에 업로드
-        s3Client.getAmazonS3().putObject(bucketName, objectPath, inputStream, new ObjectMetadata());
+        s3Client.getAmazonS3().putObject(bucketName, fileName, inputStream, new ObjectMetadata());
 
         // ACL 설정
-        setAcl(s3Client.getAmazonS3(), objectPath);
+        setAcl(s3Client.getAmazonS3(), fileName);
 
         // 업로드된 파일의 URL 생성
-        String baseUploadURL = "https://balpyo-bucket.s3.ap-northeast-2.amazonaws.com/audio";
+        String baseUploadURL = "https://balpyo-bucket.s3.ap-northeast-2.amazonaws.com//" + fileName;
 
-        log.info("업로드 위치------" + baseUploadURL + objectPath);
+        log.info("업로드 위치------" + baseUploadURL);
 
-        return baseUploadURL + objectPath;
+        // 재생시간 계산 로직 추가
+        try {
+            File outputFile = new File(baseUploadURL);
+            AudioFile audioFile = AudioFileIO.read(outputFile);
+            int duration = audioFile.getAudioHeader().getTrackLength();
+            log.info("------------ 재생시간: " + duration + "초");
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        return baseUploadURL;
     }
+
+
+
+//    private String uploadToS3(InputStream inputStream, String fileName) {
+//        String objectPath = "/" + fileName; // S3에 저장될 경로
+//
+//        // S3에 업로드
+//        s3Client.getAmazonS3().putObject(bucketName, objectPath, inputStream, new ObjectMetadata());
+//
+//        // ACL 설정
+//        setAcl(s3Client.getAmazonS3(), objectPath);
+//
+//        // 업로드된 파일의 URL 생성
+//        String baseUploadURL = "https://balpyo-bucket.s3.ap-northeast-2.amazonaws.com/audio";
+//
+//
+//
+//        log.info("업로드 위치------" + baseUploadURL + objectPath);
+//
+//        return baseUploadURL + objectPath;
+//    }
 
     public void setAcl(AmazonS3 s3, String objectPath) {
         AccessControlList objectAcl = s3.getObjectAcl(bucketName, objectPath);

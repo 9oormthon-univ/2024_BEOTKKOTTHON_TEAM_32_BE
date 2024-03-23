@@ -9,4 +9,6 @@ import lombok.*;
 @NoArgsConstructor
 public class UploadResultDTO {
     private String profileUrl;
+
+    private int playTime;
 }
