@@ -12,13 +12,23 @@ import com.amazonaws.services.s3.model.ObjectMetadata;
 import com.amazonaws.services.s3.model.Permission;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
+import org.jaudiotagger.audio.mp3.MP3AudioHeader;
+import org.jaudiotagger.audio.mp3.MP3File;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.stereotype.Service;
 import site.balpyo.ai.dto.PollyDTO;
 import site.balpyo.ai.dto.upload.UploadResultDTO;
 import site.balpyo.common.s3.S3Client;
 
-import java.io.InputStream;
+
+import java.io.*;
+import java.net.URL;
+
+import java.nio.file.Files;
+import java.nio.file.Paths;
+import java.nio.file.StandardCopyOption;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.UUID;
 
 /**
@@ -148,32 +158,74 @@ public class PollyService {
         log.info("--------------------- " + fileName);
 
         // S3에 업로드
-        String profileUrl = uploadToS3(audioStream, fileName);
+        Map<String, Object> audioInfo = uploadToS3(audioStream, fileName);
 
-        log.info("--------------------- " + profileUrl);
+        String baseUploadURL = audioInfo.get("baseUploadURL").toString();
+        int durationInSeconds = (int) audioInfo.get("durationInSeconds");
+        log.info("--------------------- " + baseUploadURL);
+        log.info("--------------------- " + durationInSeconds);
 
 
         return UploadResultDTO.builder()
-                .profileUrl(profileUrl)
+                .profileUrl(baseUploadURL)
+                .playTime(durationInSeconds)
                 .build();
     }
 
-    private String uploadToS3(InputStream inputStream, String fileName) {
-        String objectPath = "/" + fileName; // S3에 저장될 경로
+    private Map<String, Object> uploadToS3(InputStream inputStream, String fileName) {
+
+        log.info("--------------------- " + fileName);
 
         // S3에 업로드
-        s3Client.getAmazonS3().putObject(bucketName, objectPath, inputStream, new ObjectMetadata());
+        s3Client.getAmazonS3().putObject(bucketName, fileName, inputStream, new ObjectMetadata());
 
         // ACL 설정
-        setAcl(s3Client.getAmazonS3(), objectPath);
+        setAcl(s3Client.getAmazonS3(), fileName);
 
         // 업로드된 파일의 URL 생성
-        String baseUploadURL = "https://balpyo-bucket.s3.ap-northeast-2.amazonaws.com/audio";
+        String baseUploadURL = "https://balpyo-bucket.s3.ap-northeast-2.amazonaws.com/" + fileName;
 
-        log.info("업로드 위치------" + baseUploadURL + objectPath);
+        log.info("업로드 위치------" + baseUploadURL);
 
-        return baseUploadURL + objectPath;
+        // 임시 파일로 저장하여 처리
+        int durationInSeconds = 0; // 초기화
+
+        try {
+
+            URL url = new URL(baseUploadURL);
+            InputStream targetStream = url.openStream();
+            fileName = Paths.get(url.getPath()).getFileName().toString();
+            File localFile = new File(System.getProperty("java.io.tmpdir"), fileName);
+
+//            File localFile = new File(baseUploadURL);
+            log.info("Download------" + localFile);
+            Files.copy(targetStream, localFile.toPath(), StandardCopyOption.REPLACE_EXISTING);
+            targetStream.close(); // 스트림 닫기
+
+            // MP3 파일의 재생 시간 계산
+            MP3File mp3File = new MP3File(localFile);
+
+            log.info("mp3 file" + mp3File);
+
+            MP3AudioHeader audioHeader = (MP3AudioHeader) mp3File.getAudioHeader();
+            durationInSeconds = audioHeader.getTrackLength();
+
+            log.info("------------ 재생시간: " + durationInSeconds + "초");
+
+            // 임시 파일 삭제
+            localFile.delete();
+
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+
+        // 결과를 Map에 담아 반환
+        Map<String, Object> result = new HashMap<>();
+        result.put("baseUploadURL", baseUploadURL);
+        result.put("durationInSeconds", durationInSeconds);
+        return result;
     }
+
 
     public void setAcl(AmazonS3 s3, String objectPath) {
         AccessControlList objectAcl = s3.getObjectAcl(bucketName, objectPath);
