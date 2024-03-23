@@ -5,6 +5,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpStatus;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.PostMapping;
@@ -12,6 +13,7 @@ import org.springframework.web.bind.annotation.RequestBody;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 import site.balpyo.ai.dto.PollyDTO;
+import site.balpyo.ai.dto.upload.UploadResultDTO;
 import site.balpyo.ai.service.PollyService;
 import site.balpyo.common.dto.CommonResponse;
 import site.balpyo.common.dto.ErrorEnum;
@@ -76,5 +78,12 @@ public class PollyController {
         }
     }
 
+    @PostMapping("/uploadSpeech")
+    public ResponseEntity<UploadResultDTO> synthesizeAndUploadSpeech(@RequestBody PollyDTO pollyDTO) throws IOException {
+        UploadResultDTO uploadResultDTO = pollyService.synthesizeAndUploadSpeech(pollyDTO);
+        HttpHeaders headers = new HttpHeaders();
+        headers.setContentType(MediaType.APPLICATION_JSON);
+        return new ResponseEntity<>(uploadResultDTO, headers, HttpStatus.OK);
+    }
 
 }
