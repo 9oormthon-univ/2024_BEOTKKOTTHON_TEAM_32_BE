@@ -70,11 +70,12 @@ public class ScriptService {
         Optional<GuestEntity> guestEntity = guestRepository.findById(uid);
 
         if(guestEntity.isEmpty())return CommonResponse.error(ErrorEnum.GUEST_NOT_FOUND);
-        if(guestEntity.get().getScriptEntities().isEmpty())return CommonResponse.error(ErrorEnum.SCRIPT_NOT_FOUND);
+        List<ScriptResponse> scriptResponses = new ArrayList<>();
+        if(guestEntity.get().getScriptEntities().isEmpty())return CommonResponse.success(scriptResponses);
 
         List<ScriptEntity> scriptEntities = guestEntity.get().getScriptEntities();
 
-        List<ScriptResponse> scriptResponses = new ArrayList<>();
+
         for(ScriptEntity scriptEntity: scriptEntities){
               ScriptResponse scriptResponse = ScriptResponse.builder()
                 .scriptId(scriptEntity.getScript_id())
