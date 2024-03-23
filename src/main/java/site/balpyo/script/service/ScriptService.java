@@ -9,6 +9,7 @@ import site.balpyo.ai.entity.GPTInfoEntity;
 import site.balpyo.ai.repository.AIGenerateLogRepository;
 import site.balpyo.ai.repository.GPTInfoRepository;
 import site.balpyo.common.dto.CommonResponse;
+import site.balpyo.common.dto.ErrorEnum;
 import site.balpyo.guest.entity.GuestEntity;
 import site.balpyo.guest.repository.GuestRepository;
 import site.balpyo.script.dto.ScriptRequest;
@@ -16,6 +17,8 @@ import site.balpyo.script.dto.ScriptResponse;
 import site.balpyo.script.entity.ScriptEntity;
 import site.balpyo.script.repository.ScriptRepository;
 
+import java.util.ArrayList;
+import java.util.List;
 import java.util.Optional;
 
 @Service
@@ -61,5 +64,29 @@ public class ScriptService {
         ScriptResponse scriptResponse = new ScriptResponse(scriptRequest.getScript(), scriptRequest.getGptId(),uid,scriptRequest.getTitle(),scriptRequest.getSecTime());
 
         return CommonResponse.success(scriptResponse);
+    }
+
+    public ResponseEntity<CommonResponse> getScript(String uid) {
+        Optional<GuestEntity> guestEntity = guestRepository.findById(uid);
+
+        if(guestEntity.isEmpty())return CommonResponse.error(ErrorEnum.GUEST_NOT_FOUND);
+        if(guestEntity.get().getScriptEntities().isEmpty())return CommonResponse.error(ErrorEnum.SCRIPT_NOT_FOUND);
+
+        List<ScriptEntity> scriptEntities = guestEntity.get().getScriptEntities();
+
+        List<ScriptResponse> scriptResponses = new ArrayList<>();
+        for(ScriptEntity scriptEntity: scriptEntities){
+            ScriptResponse scriptResponse = ScriptResponse.builder()
+                    .scriptId(scriptEntity.getScript_id())
+                    .uid(uid)
+                    .title(scriptEntity.getTitle())
+                    .secTime(scriptEntity.getSecTime())
+                    .build();
+
+            scriptResponses.add(scriptResponse);
+        }
+
+        return CommonResponse.success(scriptResponses);
+
     }
 }

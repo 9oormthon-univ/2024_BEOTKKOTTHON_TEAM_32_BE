@@ -7,6 +7,12 @@ import lombok.Getter;
 @AllArgsConstructor
 public enum ErrorEnum {
 
+    //6000 - Sript 계열 에러
+    SCRIPT_NOT_FOUND("6001", "저장된 스크립트가 없습니다."),
+
+    //7000 - Guest 계열에러
+    GUEST_NOT_FOUND("7001", "존재하지 않는 게스트입니다."),
+
     //8000 - GPT 계열에러
     GPT_GENERATION_ERROR("8001", "GPT 스크립트 생성 실패."),
     GPT_API_KEY_MISSING("8002", "GPT API 키 누락."),

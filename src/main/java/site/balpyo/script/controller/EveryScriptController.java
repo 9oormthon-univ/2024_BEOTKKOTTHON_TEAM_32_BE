@@ -22,7 +22,16 @@ public class EveryScriptController {
     public ResponseEntity<CommonResponse> saveScript(@RequestBody ScriptRequest scriptRequest,
                                                      @RequestHeader(value = "UID", required = false) String uid){
 
-        if(CommonUtils.isAnyParameterNullOrBlank(uid))return CommonResponse.error(ErrorEnum.BALPYO_UID_KEY_MISSING);
-        return scriptService.saveScript(scriptRequest,uid);
+        if(CommonUtils.isAnyParameterNullOrBlank(uid)) return CommonResponse.error(ErrorEnum.BALPYO_UID_KEY_MISSING);
+        return scriptService.saveScript(scriptRequest, uid);
     }
+
+    @GetMapping("/script")
+    public ResponseEntity<CommonResponse> getScript(@RequestHeader(value = "UID", required = false) String uid) {
+
+        System.out.println("진입");
+        if (CommonUtils.isAnyParameterNullOrBlank(uid)) return CommonResponse.error(ErrorEnum.BALPYO_UID_KEY_MISSING);
+        return scriptService.getScript(uid);
+    }
+
 }
