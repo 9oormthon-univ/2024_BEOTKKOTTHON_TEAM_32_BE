@@ -15,6 +15,7 @@ import site.balpyo.guest.repository.GuestRepository;
 import site.balpyo.script.dto.ScriptRequest;
 import site.balpyo.script.dto.ScriptResponse;
 import site.balpyo.script.entity.ScriptEntity;
+import site.balpyo.script.entity.ScriptStatus;
 import site.balpyo.script.repository.ScriptRepository;
 
 import java.util.ArrayList;
@@ -32,7 +33,6 @@ public class ScriptService {
 
 
     public ResponseEntity<CommonResponse> saveScript(ScriptRequest scriptRequest, String uid) {
-
 
         GuestEntity guestEntity = null;
         if (uid != null) {
@@ -62,10 +62,104 @@ public class ScriptService {
 
         scriptRepository.save(scriptEntity);
 
-        ScriptResponse scriptResponse = new ScriptResponse(null,scriptRequest.getScript(), scriptRequest.getGptId(),uid,scriptRequest.getTitle(),scriptRequest.getSecTime(),null);
+
+        ScriptResponse scriptResponse = ScriptResponse.builder()
+                .scriptId(scriptEntity.getScript_id())
+                .script(scriptRequest.getScript())
+                .gptId(scriptRequest.getGptId())
+                .uid(uid)
+                .title(scriptRequest.getTitle())
+                .secTime(scriptRequest.getSecTime())
+                .build();
+
 
         return CommonResponse.success(scriptResponse);
     }
+
+
+    //new버전 1. 임시 스크립트 저장
+    public ResponseEntity<CommonResponse> saveTemporaryScript(String title,Integer secTime, String uid, String generatedScript, AIGenerateLogEntity aiGenerateLogEntity) {
+
+        GuestEntity guestEntity = null;
+        if (uid != null) {
+            guestEntity = guestRepository.findById(uid).orElse(null);
+        }
+
+        ScriptEntity scriptEntity = ScriptEntity.builder()
+                .title(title)
+                .script(generatedScript)
+                .secTime(secTime)
+                .guestEntity(guestEntity)
+                .aiGenerateLogEntity(aiGenerateLogEntity)
+                .voiceFilePath("")
+                .status(ScriptStatus.TEMP)
+                .build();
+
+        ScriptEntity savedEntity = scriptRepository.save(scriptEntity);
+
+        //저장된 스크립트 아이디 반환
+        return CommonResponse.success(savedEntity.getScript_id());
+    }
+
+    //new버전 2. 최종 스크립트 저장완료
+    public ResponseEntity<CommonResponse> saveFinalScript(String title, String script, Integer secTime, String uid, Long scriptId) {
+
+        GuestEntity guestEntity = null;
+        if (uid != null) {
+            guestEntity = guestRepository.findById(uid).orElse(null);
+        }
+
+        Optional<ScriptEntity> optionalScriptEntity = scriptRepository.findById(scriptId);
+
+        if(optionalScriptEntity.isPresent()){
+            ScriptEntity scriptEntity = ScriptEntity.builder()
+                    .title(title)
+                    .script(script)
+                    .secTime(secTime)
+                    .guestEntity(guestEntity)
+                    .status(ScriptStatus.SCRIPTCOMPLETED)
+                    .build();
+
+            ScriptEntity savedEntity = scriptRepository.save(scriptEntity);
+            return CommonResponse.success(savedEntity);
+        }
+
+        return CommonResponse.error(ErrorEnum.SCRIPT_NOT_FOUND);
+    }
+
+    public ResponseEntity<CommonResponse> getAllTemporaryScript(String uid) {
+        Optional<GuestEntity> guestEntity = guestRepository.findById(uid);
+
+        if (guestEntity.isEmpty()) {
+            return CommonResponse.error(ErrorEnum.GUEST_NOT_FOUND);
+        }
+
+        List<ScriptResponse> scriptResponses = new ArrayList<>();
+        List<ScriptEntity> scriptEntities = guestEntity.get().getScriptEntities();
+
+        // 필터링하여 Status가 TEMP인 ScriptEntity만 가져옴
+        scriptEntities.stream()
+                .filter(scriptEntity -> scriptEntity.getStatus() == ScriptStatus.TEMP)
+                .forEach(scriptEntity -> {
+                    ScriptResponse scriptResponse = ScriptResponse.builder()
+                            .scriptId(scriptEntity.getScript_id())
+                            .uid(uid)
+                            .title(scriptEntity.getTitle())
+                            .secTime(scriptEntity.getSecTime())
+                            .voiceFilePath(scriptEntity.getVoiceFilePath())
+                            .status(scriptEntity.getStatus().name())
+                            .build();
+
+                    scriptResponses.add(scriptResponse);
+                });
+
+        return CommonResponse.success(scriptResponses);
+    }
+
+
+
+
+
 
     public ResponseEntity<CommonResponse> getAllScript(String uid) {
         Optional<GuestEntity> guestEntity = guestRepository.findById(uid);
@@ -84,6 +178,7 @@ public class ScriptService {
                 .title(scriptEntity.getTitle())
                 .secTime(scriptEntity.getSecTime())
                       .voiceFilePath(scriptEntity.getVoiceFilePath())
+                      .status(scriptEntity.getStatus().name())
                 .build();
 
         scriptResponses.add(scriptResponse);

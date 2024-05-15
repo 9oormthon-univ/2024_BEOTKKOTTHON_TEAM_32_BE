@@ -16,6 +16,7 @@ import site.balpyo.common.dto.ErrorEnum;
 import site.balpyo.common.util.CommonUtils;
 import site.balpyo.guest.entity.GuestEntity;
 import site.balpyo.guest.repository.GuestRepository;
+import site.balpyo.script.service.ScriptService;
 
 import javax.transaction.Transactional;
 import java.util.Map;
@@ -33,6 +34,8 @@ public class AIGenerateService {
     private final AIGenerateLogRepository aiGenerateLogRepository;
 
     private final GuestRepository guestRepository;
+
+    private final ScriptService scriptService;
 
     @Value("${secrets.GPT_API_KEY}")
     public String GPT_API_KEY;
@@ -66,7 +69,6 @@ public class AIGenerateService {
 
         //6. AI 사용기록에 gpt정보와 요청값들을 AIGenerateLogEntity형태로 변환
         AIGenerateLogEntity aiGenerateLog = new AIGenerateLogEntity().convertToEntity(request , gptInfoData,guestEntity);
-
 
 
         aiGenerateLogRepository.save(aiGenerateLog); //저장

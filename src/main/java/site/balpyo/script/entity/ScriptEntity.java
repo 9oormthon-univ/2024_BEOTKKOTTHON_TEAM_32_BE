@@ -41,6 +41,8 @@ public class ScriptEntity {
     @JoinColumn(name = "uid")
     private GuestEntity guestEntity;
 
+    @Enumerated(EnumType.STRING)
+    private Enum status;
 
 }
 

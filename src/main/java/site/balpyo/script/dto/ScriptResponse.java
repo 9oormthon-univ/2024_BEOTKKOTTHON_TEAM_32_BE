@@ -15,5 +15,6 @@ public class ScriptResponse {
         private String title;
         private Integer secTime;
         private String voiceFilePath;
+        private String status;
 
 }
