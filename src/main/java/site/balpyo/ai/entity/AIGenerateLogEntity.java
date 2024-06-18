@@ -1,12 +1,13 @@
 package site.balpyo.ai.entity;
 
+
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import site.balpyo.ai.dto.AIGenerateRequest;
 import site.balpyo.guest.entity.GuestEntity;
 import site.balpyo.script.entity.ScriptEntity;
 
-import javax.persistence.*;
 import java.time.LocalDateTime;
 
 @Getter
@@ -44,7 +45,7 @@ public class AIGenerateLogEntity {
     @CreationTimestamp
     private LocalDateTime createdAt;
 
-    public AIGenerateLogEntity convertToEntity(AIGenerateRequest aiGenerateRequest, GPTInfoEntity gptInfoEntity,GuestEntity guestEntity){
+    public AIGenerateLogEntity convertToEntity(AIGenerateRequest aiGenerateRequest, GPTInfoEntity gptInfoEntity, GuestEntity guestEntity){
         return AIGenerateLogEntity.builder()
                 .secTime(aiGenerateRequest.getSecTime())
                 .topic(aiGenerateRequest.getTopic())

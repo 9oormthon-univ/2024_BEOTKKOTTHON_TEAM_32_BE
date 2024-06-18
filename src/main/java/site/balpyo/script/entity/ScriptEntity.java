@@ -1,11 +1,12 @@
 package site.balpyo.script.entity;
 
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import site.balpyo.ai.entity.AIGenerateLogEntity;
 import site.balpyo.guest.entity.GuestEntity;
 
-import javax.persistence.*;
+
 import java.time.LocalDateTime;
 
 @Getter
@@ -22,6 +23,7 @@ public class ScriptEntity {
     private Long script_id;
 
     @Lob
+    @Column(columnDefinition = "LONGTEXT")
     private String script;
 
     private String title;

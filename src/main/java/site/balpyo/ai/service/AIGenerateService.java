@@ -1,6 +1,7 @@
 package site.balpyo.ai.service;
 
 
+import jakarta.transaction.Transactional;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -17,7 +18,7 @@ import site.balpyo.common.util.CommonUtils;
 import site.balpyo.guest.entity.GuestEntity;
 import site.balpyo.guest.repository.GuestRepository;
 
-import javax.transaction.Transactional;
+
 import java.util.Map;
 import java.util.Objects;
 import java.util.Optional;
