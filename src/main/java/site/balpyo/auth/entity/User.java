@@ -39,6 +39,11 @@ public class User {
     private String password;
 
 
+    private Integer coin;
+
+    @Enumerated(EnumType.STRING)
+    private LoginType loginType;
+
     @ManyToMany(fetch = FetchType.LAZY)
     @JoinTable(  name = "user_roles",
             joinColumns = @JoinColumn(name = "user_id"),

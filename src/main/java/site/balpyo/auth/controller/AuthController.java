@@ -14,6 +14,7 @@ import site.balpyo.auth.dto.request.SignupRequest;
 import site.balpyo.auth.dto.response.JwtResponse;
 import site.balpyo.auth.dto.response.MessageResponse;
 import site.balpyo.auth.entity.ERole;
+import site.balpyo.auth.entity.LoginType;
 import site.balpyo.auth.entity.Role;
 import site.balpyo.auth.entity.User;
 import site.balpyo.auth.repository.RoleRepository;
@@ -118,7 +119,8 @@ public class AuthController {
 
         user.setRoles(roles);
 
-        user.setSecretKey(UUID.randomUUID().toString());
+        user.setCoin(3);// TODO : 최초 가입시 제공받는 코인 갯수 차후 확장성있게 수정가능하도록 구현할 예쩡
+        user.setLoginType(LoginType.LOCAL);
         userRepository.save(user);
 
         return ResponseEntity.ok(new MessageResponse("User registered successfully!"));
