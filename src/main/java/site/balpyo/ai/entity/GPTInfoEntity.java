@@ -2,13 +2,14 @@ package site.balpyo.ai.entity;
 
 import com.fasterxml.jackson.databind.JsonNode;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.stereotype.Service;
 import site.balpyo.ai.dto.GPTResponse;
 
 import javax.annotation.processing.Completion;
-import javax.persistence.*;
+
 import java.time.LocalDateTime;
 
 @Getter
@@ -32,6 +33,7 @@ public class GPTInfoEntity {
     private Integer promptToken;
 
     @Lob
+    @Column(columnDefinition = "LONGTEXT")
     private String gptGeneratedScript;
 
     private Integer completionToken;

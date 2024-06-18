@@ -1,11 +1,12 @@
 package site.balpyo.script.entity;
 
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import site.balpyo.ai.entity.AIGenerateLogEntity;
 import site.balpyo.guest.entity.GuestEntity;
 
-import javax.persistence.*;
+
 import java.time.LocalDateTime;
 
 @Getter
@@ -22,6 +23,7 @@ public class ScriptEntity {
     private Long script_id;
 
     @Lob
+    @Column(columnDefinition = "LONGTEXT")
     private String script;
 
     private String title;
@@ -40,6 +42,9 @@ public class ScriptEntity {
     @ManyToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "uid")
     private GuestEntity guestEntity;
+
+    @Column(nullable = false)
+    private Boolean isGenerating; // 작업 진행 중 여부를 나타내는 필드
 
 
 }

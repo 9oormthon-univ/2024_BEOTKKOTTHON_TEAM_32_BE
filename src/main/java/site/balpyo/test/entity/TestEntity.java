@@ -1,14 +1,15 @@
 package site.balpyo.test.entity;
 
-import com.sun.istack.NotNull;
-import com.sun.istack.Nullable;
-import jdk.jfr.Timestamp;
+
+import jakarta.persistence.Entity;
+import jakarta.persistence.GeneratedValue;
+import jakarta.persistence.Id;
+import jakarta.persistence.Table;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import org.springframework.data.annotation.CreatedDate;
 
-import javax.persistence.*;
-import java.sql.Time;
+
 import java.time.LocalDateTime;
 
 @Data

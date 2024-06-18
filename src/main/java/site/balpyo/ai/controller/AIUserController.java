@@ -1,5 +1,6 @@
 package site.balpyo.ai.controller;
 
+import jakarta.validation.Valid;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.slf4j.Slf4j;
 import org.springframework.beans.factory.annotation.Value;
@@ -11,7 +12,6 @@ import site.balpyo.common.dto.CommonResponse;
 import site.balpyo.common.dto.ErrorEnum;
 import site.balpyo.common.util.CommonUtils;
 
-import javax.validation.Valid;
 
 
 @CrossOrigin

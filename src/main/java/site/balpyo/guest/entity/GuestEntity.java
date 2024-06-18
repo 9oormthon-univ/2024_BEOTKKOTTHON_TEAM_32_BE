@@ -1,11 +1,12 @@
 package site.balpyo.guest.entity;
 
+import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
 import site.balpyo.ai.entity.AIGenerateLogEntity;
 import site.balpyo.script.entity.ScriptEntity;
 
-import javax.persistence.*;
+
 import java.time.LocalDateTime;
 import java.util.List;
 

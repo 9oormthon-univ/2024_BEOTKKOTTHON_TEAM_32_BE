@@ -8,7 +8,7 @@ import site.balpyo.common.dto.CommonResponse;
 import site.balpyo.common.dto.ErrorEnum;
 import site.balpyo.common.util.CommonUtils;
 import site.balpyo.script.dto.ScriptRequest;
-import site.balpyo.script.service.ScriptService;
+import site.balpyo.script.service.ScriptServiceDeprecated;
 
 @RestController
 @CrossOrigin
@@ -16,7 +16,7 @@ import site.balpyo.script.service.ScriptService;
 @RequestMapping("/every/manage")
 public class EveryScriptController {
 
-    private final ScriptService scriptService;
+    private final ScriptServiceDeprecated scriptService;
 
     @PostMapping("/script")
     public ResponseEntity<CommonResponse> saveScript(@RequestBody ScriptRequest scriptRequest,
